@@ -164,7 +164,9 @@ $$\begin{array}{cc}
 \\[0.2in]
 
 \inference
-    {\hastype{\Gamma, \rvar:\tau}{e}{\sigma} && \tau \mbox{ is non-refined } 
+    {\hastype{\Gamma, \rvar:\tau}{e}{\sigma} &&
+     \isWellFormed{\Gamma}{\tau} 
+     % \tau \mbox{ is non-refined } 
      %\isWellFormed{\Gamma}{\tpabs{p}{\tau}{\pi}} && 
      %p \notin \fv{e}
     }

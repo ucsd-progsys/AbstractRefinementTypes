@@ -4,11 +4,6 @@
  as the reviewer states, this can not happen in the formal language,
 so should we clarify that in the overview section?
 
-* - Rule T-PGen: you say it's one of the novelty, but you don't explain
-  why tau should not be refined.
-Since we treat predicates as program variables, maybe the \tau is
-not-refined is not needed
-
 * Since the subtyping relation is reflexive, I would use \preceq
 instead of \prec.
 I agree with that, even it is minor.
