@@ -1,0 +1,102 @@
+%\documentclass{llncs}
+\documentclass[runningheads,a4paper]{llncs}
+%%% \usepackage[top=1.5cm,bottom=1.5cm,left=2.3cm,right=2cm]{geometry}
+
+\pagestyle{plain}
+\usepackage{times}
+%\usepackage[nocompress]{cite} % AR: comment this out if you wish hyperrefs 
+
+\usepackage{amsmath,amssymb, latexsym}
+
+\usepackage[latin1]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+
+\usepackage{liquidHaskell}
+\usepackage[inference]{semantic}
+
+%\usepackage{subfigure}
+%\usepackage{graphicx}
+%\usepackage[usenames,dvipsnames]{color}
+\usepackage{enumerate}
+\def\url{}
+\usepackage{xspace}
+\usepackage{epsfig}
+\usepackage{mathpartir}
+\usepackage{booktabs}
+
+%\usepackage{extarrows}
+%\usepackage{pgf,tikz}
+%\usetikzlibrary{arrows,automata}
+
+\usepackage{ifthen}
+
+\newcommand{\isTechReport}{false} % true or false
+\newcommand{\includeProof}[1]{
+  \ifthenelse{\equal{\isTechReport}{true}}{
+    #1
+  }{
+  }
+}
+
+
+
+%%%%%\usepackage{fancyvrb}
+%%%%%\DefineVerbatimEnvironment{code}{Verbatim}{fontsize=\small}
+%%%%%\DefineVerbatimEnvironment{example}{Verbatim}{fontsize=\small}
+%%%%%\newcommand{\ignore}[1]{}
+
+% command to end a proof or definition:
+%\def\qed{\rule{0.4em}{1.4ex}}
+\def\qed{\hfill$\Box$}
+
+% space at the beginning of an environment:
+\def\@envspa{\hspace{0.3em}}
+\def\@sa{\hspace{-0.2em}}
+\def\@sb{\hspace{0.5em}}
+\def\@sc{\hspace{-0.1em}}
+
+\def\sk{\smallskip}		% space before and after theorems
+
+\newtheorem{notation}{Notation}{\itshape}{}
+\newtheorem{invariant}{Invariant}
+
+\input{commands}
+\input{haskellListings}
+
+\sloppy
+
+\title{Abstract Refinement Types} 
+
+\author{
+  Niki Vazou\inst{1} \and
+  Patrick M. Rondon\inst{2} \and
+  Ranjit Jhala\inst{1}
+}
+\institute{$^1$UC San Diego \quad $^2$Google}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\input{abstract2}
+\end{abstract}
+
+\input{intro}
+\input{overview}
+\input{typechecking2}
+\input{experiments}
+\input{related}
+
+{
+\bibliographystyle{plain}
+\bibliography{sw}
+}
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "main"
+%%% End: 
