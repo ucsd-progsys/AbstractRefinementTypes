@@ -16,4 +16,3 @@ cf.
 https://github.com/ucsd-progsys/liquidhaskell/blob/master/blog/2013-01-05-verifying-vectors-with-dependent-refinements.lhs#L328
 
 I recall there was some mention that this would simplify the exposition of `Vec` in the paper, so we may as well do it...
-
