@@ -1,0 +1,28 @@
+* comparison with F<:
+
+*  terms 'e' diverges or crashed
+ as the reviewer states, this can not happen in the formal language,
+so should we clarify that in the overview section?
+
+* - Rule T-PGen: you say it's one of the novelty, but you don't explain
+  why tau should not be refined.
+Since we treat predicates as program variables, maybe the \tau is
+not-refined is not needed
+
+* Since the subtyping relation is reflexive, I would use \preceq
+instead of \prec.
+I agree with that, even it is minor.
+
+* update the time in benchmarks
+
+* adjusting the language about how automated we are (re: reviewer one)
+
+* type aliases so you can now write:
+
+{-@ type SparseVector a N = [({v: Int | (0 <= v && v < N)}, a)] @-}
+
+cf.
+https://github.com/ucsd-progsys/liquidhaskell/blob/master/blog/2013-01-05-verifying-vectors-with-dependent-refinements.lhs#L328
+
+I recall there was some mention that this would simplify the exposition of `Vec` in the paper, so we may as well do it...
+
