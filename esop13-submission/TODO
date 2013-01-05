@@ -6,7 +6,7 @@
  as the reviewer states, this can not happen in the formal language,
 so should we clarify that in the overview section?
 
-* adjusting the language about how automated we are (re: reviewer one)
+==> adjusting the language about how automated we are (re: reviewer one)
 
 * type aliases so you can now write:
 
