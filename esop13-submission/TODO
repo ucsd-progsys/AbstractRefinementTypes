@@ -4,10 +4,6 @@
  as the reviewer states, this can not happen in the formal language,
 so should we clarify that in the overview section?
 
-* Since the subtyping relation is reflexive, I would use \preceq
-instead of \prec.
-I agree with that, even it is minor.
-
 * update the time in benchmarks
 
 * adjusting the language about how automated we are (re: reviewer one)
