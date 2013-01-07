@@ -98,7 +98,18 @@ merely states that \emph{some} @Int@  is returned as output, and not
 necessarily one that enjoys the properties of the values in the input
 list. This is a shame, since the property clearly still holds.
 
-We solve this problem with \emph{abstract refinements}, which let us 
+One approach to this problem is to introduce bounded subtyping, 
+so that we type max as
+@max :: forall t <: Int. t -> t -> t@.
+%
+This 
+approach is extremely heavyweight, requiring us to introduce 
+subtyping and all its attendant 
+complications into our type system, 
+and can make type 
+checking undecidable \cite{piercebook}.
+
+To solve this problem, we introduce \emph{abstract refinements}, which let us 
 quantify or parameterize a type over its constituent refinements.
 For example, we can type @max@ as
 $$\centering
