@@ -102,12 +102,9 @@ One approach to this problem is to introduce bounded subtyping,
 so that we type max as
 @max :: forall t <: Int. t -> t -> t@.
 %
-This 
-approach is extremely heavyweight, requiring us to introduce 
-subtyping and all its attendant 
-complications into our type system, 
-and can make type 
-checking undecidable \cite{piercebook}.
+However, this approach is rather heavyweight, requiring us to 
+introduce bounded quantification and its attendant complications 
+into our type system which can make type checking undecidable \cite{piercebook}.
 
 To solve this problem, we introduce \emph{abstract refinements}, which let us 
 quantify or parameterize a type over its constituent refinements.

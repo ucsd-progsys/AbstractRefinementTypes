@@ -1,18 +1,10 @@
 ==>  comparison with F<:
-  It is a higher order system -> added in the last paragraph.
-  Comparison could be added in 2.1 but its purpose is to introduce the idea of liquid types -- not to compare. 
+     It is a higher order system -> added in the last paragraph.
+     Comparison could be added in 2.1 but its purpose is to 
+     introduce the idea of liquid types -- not to compare. 
 
 *  terms 'e' diverges or crashed
- as the reviewer states, this can not happen in the formal language,
-so should we clarify that in the overview section?
+   as the reviewer states, this can not happen in the formal 
+   language, so should we clarify that in the overview section?
 
 ==> adjusting the language about how automated we are (re: reviewer one)
-
-* type aliases so you can now write:
-
-{-@ type SparseVector a N = [({v: Int | (0 <= v && v < N)}, a)] @-}
-
-cf.
-https://github.com/ucsd-progsys/liquidhaskell/blob/master/blog/2013-01-05-verifying-vectors-with-dependent-refinements.lhs#L328
-
-I recall there was some mention that this would simplify the exposition of `Vec` in the paper, so we may as well do it...
