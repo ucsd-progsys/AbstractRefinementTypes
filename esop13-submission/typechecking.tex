@@ -31,10 +31,13 @@ inside $e$, and the corresponding refinement application $\epapp{e}{e}$.
 %where each $\tau_i$ is a simple (non-function) type.
 
 \mypara{Refinements}
-A \emph{concrete refinement} \reft is a boolean
-valued expression \reft (which we will embed into an SMT decidable 
-refinement logic including the theory of linear arithmetic and 
-uninterpreted functions.)
+A \emph{concrete refinement} \reft is a boolean valued expression \reft 
+drawn from a \emph{strict} subset of the language of expressions which
+includes only terms that 
+(a)~neither diverge nor crash, and 
+(b)~can be embedded into an SMT decidable refinement logic including 
+the theory of linear arithmetic and uninterpreted functions.
+%
 An \emph{abstract refinement} \areft is a conjunction of refinement
 variable applications of the form $\rvapp{\pi}{e}$.
 
