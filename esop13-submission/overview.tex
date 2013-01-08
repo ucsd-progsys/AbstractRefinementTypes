@@ -72,11 +72,17 @@ Finally, the system infers that {@0 :: Even@} and {@xs' :: [Even]@},
 the program.
 %
 The refined type instantiations can be \emph{automatically} inferred,
+from an appropriate set of logical qualifiers, 
 using the abstract interpretation framework of Liquid
-Types~\cite{LiquidPLDI08}, 
-with the appropriate set of logical qualifiers $\mathbb{Q}^\star$.
-Thereby the above verification can be made automatically,
-given that @ v %  2 = 0@ $ \in \mathbb{Q}^\star$.
+Types~\cite{LiquidPLDI08}.
+Here, once 
+@v%2 = 0@ 
+is added to the set of qualifiers, either manually (or, as done by 
+our implementation, by automatically scraping predicates from 
+refinements appearing in specification signatures), the suitable 
+refined type instantiations, and hence verification, proceed 
+automatically.
+
 
 Thus, classical type parameters offer an easy means of encoding 
 second-order invariants, \ie of quantifying over or parametrizing 
