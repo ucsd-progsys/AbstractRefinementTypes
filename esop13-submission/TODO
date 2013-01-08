@@ -3,8 +3,4 @@
      Comparison could be added in 2.1 but its purpose is to 
      introduce the idea of liquid types -- not to compare. 
 
-*  terms 'e' diverges or crashed
-   as the reviewer states, this can not happen in the formal 
-   language, so should we clarify that in the overview section?
-
 ==> adjusting the language about how automated we are (re: reviewer one)

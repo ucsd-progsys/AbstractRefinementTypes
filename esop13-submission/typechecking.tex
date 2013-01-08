@@ -35,6 +35,12 @@ A \emph{concrete refinement} \reft is a boolean
 valued expression \reft (which we will embed into an SMT decidable 
 refinement logic including the theory of linear arithmetic and 
 uninterpreted functions.)
+%
+We chose $e$ to avoid the clutter of a separate grammar.
+In fact, the refinement language is a \emph{separate} one which only 
+includes terms that neither diverge nor crash;
+one cannot use arbitrary (source level) terms in refinements. 
+%
 An \emph{abstract refinement} \areft is a conjunction of refinement
 variable applications of the form $\rvapp{\pi}{e}$.
 
