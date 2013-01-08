@@ -7,10 +7,8 @@ automatically verify various kinds of invariants.
 \subsection{Parametric Invariants}\label{sec:overview:parametric}
 
 \mypara{Parametric Invariants via Type Polymorphism}
-Suppose we had
-a generic comparison operator of type @(<=) :: a -> a -> Bool@,
-as is the case in \textsc{OCaml}.
-We could use it to write functions 
+Suppose we had a generic comparison operator @(<=) :: a -> a -> Bool@. 
+We could use it to write functions: 
 $$\centering\begin{tabular}{c}\begin{code}
 max     :: a -> a -> a
 max x y = if x <= y then y else x 
@@ -82,12 +80,11 @@ our implementation, by automatically scraping predicates from
 refinements appearing in specification signatures), the suitable 
 refined type instantiations, and hence verification, proceed 
 automatically.
-
-
-Thus, classical type parameters offer an easy means of encoding 
+%
+Thus, parametric types offer an easy means of encoding 
 second-order invariants, \ie of quantifying over or parametrizing 
-the invariants of inputs and outputs of functions, without sacrificing
-automatic verification.
+the invariants of inputs and outputs of functions. 
+%without sacrificing automatic verification.
 
 \mypara{Parametric Invariants via Abstract Refinements}
 Instead, suppose that the comparison operator was monomorphic, and only
@@ -160,9 +157,9 @@ max     :: (Ord a) => a -> a -> a
 maximum :: (Ord a) => [a] -> a
 \end{code}\end{tabular}$$
 %
-We might be tempted to simply ignore the type class constraint, 
-and just treat \ttcode{maximum} as @[a] -> a@ but, of course, 
-this would be quite unsound, as typeclass predicates trivially preclude
+We might be tempted to ignore the typeclass constraint, 
+and treat \ttcode{maximum} as @[a] -> a@. 
+This would be quite unsound, as typeclass predicates preclude
 universal quantification over refinement types. 
 Consider the function @sum :: (Num a) => [a] -> a@ which adds the elements 
 of a list.

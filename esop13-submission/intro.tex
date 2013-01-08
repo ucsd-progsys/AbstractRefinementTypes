@@ -4,7 +4,6 @@
 \section{Introduction}\label{sec:intro}
 
 Refinement types offer an automatic means 
-\footnote{\ie with automatic type \emph{checking} not inference} 
 of verifying semantic properties of programs, 
 by decorating types with predicates from logics 
 efficiently decidable by modern SMT solvers.
@@ -37,13 +36,17 @@ protocols~\cite{GordonTOPLAS2011}, web applications
 \cite{SwamyOAKLAND11} and implementations of cryptographic 
 protocols~\cite{FournetCCS11}. 
 
-Unfortunately, the automatic verification offered by refinements
-has come at a price. To ensure decidable checking with SMT
-solvers, the refinements are quantifier-free predicates drawn from a
+Unfortunately, the automatic verification 
+%% (\ie automatic type \emph{checking} not inference)
+offered by refinements has come at a price. 
+To ensure decidable checking with SMT solvers, the 
+refinements are quantifier-free predicates drawn from a
 decidable logic.  This significantly limits expressiveness by 
 precluding specifications that enable abstraction over the 
 refinements (\ie invariants). For example, consider the 
-following higher-order for-loop.
+following higher-order for-loop where @set i x v@ returns 
+the vector @v@ updated at index @i@ with the value @x@. 
+
 $$\centering
 \begin{tabular}{c}
 %
@@ -59,12 +62,10 @@ $$\centering
      initUpto a x n = for 0 n a (\i -> set i x) 
 \end{code}
 \end{tabular}$$
-%
-where @set i x v@ returns the vector @v@ updated
-at index @i@ with the value @x@. We would like to 
+
+We would like to 
 verify that @initUpto@ returns a vector whose \emph{first}
 @n@ elements are equal to @x@. 
-
 In a first-order setting, we could achieve the above with 
 a loop invariant that asserted that at the $\ttcode{i}^{th}$
 iteration, the first @i@ elements of the vector were 

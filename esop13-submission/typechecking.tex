@@ -12,6 +12,19 @@ via a reduction to contract calculi \cite{Knowles10,Greenberg11}
 Figure~\ref{fig:syntax} summarizes the syntax of our core 
 calculus \corelan which is a polymorphic $\lambda$-calculus 
 extended with abstract refinements. 
+%
+We write 
+$b$, 
+$\tref{b}{\reft}$ and 
+$\tpp{b}{\areft}$ 
+to abbreviate 
+$\tpref{b}{\true}{\true}$, 
+$\tpref{b}{\true}{\reft}$, and
+$\tpref{b}{\areft}{\true}$ respectively. 
+We say a type or schema is \emph{non-refined} if all the 
+refinements in it are $\true$. We write $\overline{z}$ 
+to abbreviate a sequence $z_1 \ldots z_n$.
+
 
 \mypara{Expressions}
 \corelan\ expressions include the standard variables $x$, 
@@ -59,19 +72,6 @@ are trivially true.
 %
 Finally, types can be quantified over refinement variables and type 
 variables to yield abstract refinement schemas.
-
-\mypara{Notation}
-We write 
-$b$, 
-$\tref{b}{\reft}$ and 
-$\tpp{b}{\areft}$ 
-to abbreviate 
-$\tpref{b}{\true}{\true}$, 
-$\tpref{b}{\true}{\reft}$, and
-$\tpref{b}{\areft}{\true}$ respectively. 
-We say a type or schema is \emph{non-refined} if all the 
-refinements in it are $\true$. We write $\overline{z}$ 
-to abbreviate a sequence $z_1 \ldots z_n$.
 
 
 \begin{figure}[t!]
