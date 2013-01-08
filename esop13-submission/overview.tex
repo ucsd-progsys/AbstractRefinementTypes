@@ -69,16 +69,16 @@ Finally, the system infers that {@0 :: Even@} and {@xs' :: [Even]@},
 \ie the arguments of {@(:)@} have the expected types, thereby verifying
 the program.
 %
-The refined type instantiations can be \emph{automatically} inferred,
+The refinement type instantiations can be inferred,
 from an appropriate set of logical qualifiers, 
 using the abstract interpretation framework of Liquid
 Types~\cite{LiquidPLDI08}.
 Here, once 
-@v%2 = 0@ 
-is added to the set of qualifiers, either manually (or, as done by 
-our implementation, by automatically scraping predicates from 
-refinements appearing in specification signatures), the suitable 
-refined type instantiations, and hence verification, proceed 
+@ v%2 = 0 @ 
+is added to the set of qualifiers, either manually or (as done by 
+our implementation) by automatically scraping predicates from 
+refinements appearing in specification signatures, the 
+refinement type instantiations, and hence verification, proceed 
 automatically.
 %
 Thus, parametric types offer an easy means of encoding 
@@ -100,16 +100,20 @@ signature shown earlier). This is because the new type of @maximum@
 merely states that \emph{some} @Int@  is returned as output, and not 
 necessarily one that enjoys the properties of the values in the input
 list. This is a shame, since the property clearly still holds.
+We could type
+%@max :: forall t <: Int. t -> t -> t@
+$$\centering
+\begin{tabular}{c}
+\begin{code}
+max :: forall t <: Int. t -> t -> t
+\end{code}
+\end{tabular}$$
+but this route would introduce the complications
+that surround bounded quantification which could render checking 
+undecidable~\cite{piercebook}.
 
-One approach to this problem is to introduce bounded subtyping, 
-so that we type max as
-@max :: forall t <: Int. t -> t -> t@.
-%
-However, this approach is rather heavyweight, requiring us to 
-introduce bounded quantification and its attendant complications 
-into our type system which can make type checking undecidable \cite{piercebook}.
-
-To solve this problem, we introduce \emph{abstract refinements}, which let us 
+To solve this problem, we introduce \emph{abstract refinements} 
+which let us 
 quantify or parameterize a type over its constituent refinements.
 For example, we can type @max@ as
 $$\centering
