@@ -257,7 +257,7 @@ set :: forall <d :: Int -> Bool, r :: Int -> a -> Bool>
        -> a<r i>
        -> Vec<d && {\k -> k != i}, r> a
        -> Vec<d, r> a
-set i v (V f) = V (\k -> if k == i then x else f k)
+set i v (V f) = V (\k -> if k == i then v else f k)
 \end{code}\end{tabular}$$
 %
 The signature for @set@ requires that 
@@ -305,7 +305,7 @@ idVec  :: Vec <{\v -> 0<=v && v<n}, {\i v -> v=i}> Int
 idVec n = initialize (\i -> i) 0 n empty
 \end{code}\end{tabular}$$
 %
-\ie @idVec@ returns an vector of size @n@ where each
+\ie @idVec@ returns a vector of size @n@ where each
 key is mapped to itself. Thus, abstract refinement types allow us 
 to verify low-level idioms such as the incremental initialization 
 of vectors, which have previously required 
@@ -406,7 +406,7 @@ type FibV = Vec<{\_->True},{\i v-> v!=0 => v=fib(i)}> Int
 %
 Finally, we can use the above alias to verify @fastFib@, 
 an implementation of the Fibonacci function, which uses 
-an vector memoize intermediate results 
+a vector memoize intermediate results 
 %
 $$\centering\begin{tabular}{c}\begin{code}
 fastFib :: n:Int -> {v:Int | v = fib(n)}
