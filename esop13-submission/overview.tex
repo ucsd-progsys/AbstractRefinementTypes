@@ -373,7 +373,7 @@ Second, we assume that @i@ satisfies the type
 @{v: Int | 0 <= v && v < n}@,
 %
 and, further, we know from the types of @s@ and @get@ that @c@ has the
-type @{v: Char | i = n - 1 => c = '\0'}@.
+type @{v: Char | i = n - 1 => v = '\0'}@.
 %
 Thus, if @c@ is non-null, then @i@ cannot be equal to @n - 1@.
 %
