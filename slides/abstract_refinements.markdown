@@ -10,15 +10,15 @@ maxInt x y = if x > y then x else y
 ~~~~~
 
 - Given
-    - n1 :: {v:Int | v > 0} <: Int  
-    - n2 :: {v:Int | v > 0} <: Int  
+    - 8  :: {v:Int | v > 0} <: Int  
+    - 12 :: {v:Int | v > 0} <: Int  
 
 - We have
-    - maxInt n1 n2 :: Int
+    - maxInt 8 12 :: Int
 
 - It should also be positive!
 
-## Monomorphic Refinements (1/2)
+## Typechecking Monomorphic Refinements
 ~~~~~{.haskell}
 maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
 maxInt x y = if x > y then x else y
@@ -34,7 +34,7 @@ maxInt x y = if x > y then x else y
      - maxInt x y    :: Int\<p\>
 
 
-## Monomorphic Refinements (2/2)
+## Using Monomorphic Refinements
 
 ~~~~~{.haskell}
 maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
@@ -43,24 +43,109 @@ maxInt x y = if x > y then x else y
 
 - Given
     - p  :: Int -> Prop
-    - n1 :: {v:Int | v > 0}
-    - n2 :: {v:Int | v > 0}
+    - 8  :: {v:Int | v > 0}
+    - 12 :: {v:Int | v > 0}
 
 - Instantiate predicate
     - p = \\v -> v > 0
 
 - We have
-    - maxInt n1 n2 :: {v:a | v > 0}
+    - maxInt 8 12 :: {v:Int | v > 0}
+
+## Outline
+- Introduction 
+    - Monomorphic Refinements
+- Applications
+    - <strong>Refinements and Type Classes</strong>
+    - Indexed Refinements
+    - Recursive Refinements
+    - Inductive Refinements
+- Evaluation
+
+
+## Ignoring Type Class Constraints
+~~~~~{.haskell}
+max    :: Ord a => a -> a -> a
+max x y = if x > y then x else y
+~~~~~
+
+- Given
+    - 8  :: {v:Int | v > 0}
+    - 12 :: {v:Int | v > 0}
+
+- Instantiate type variable
+    - a = {v:Int | v > 0}
+
+- We have
+    - max 8 12 :: {v:Int | v > 0}
+
+## Wrong Reasoning
+~~~~~{.haskell}
+minus    :: Num a => a -> a -> a
+minus x y = x - y
+~~~~~
+
+- Given
+    - 8  :: {v:Int | v > 0}
+    - 12 :: {v:Int | v > 0}
+
+- Instantiate type variable
+    - a = {v:Int | v > 0}
+
+- We have
+    - minus 8 12 = -4 :: {v:Int | v > 0}
+
+## Parametric Invariants and Type Classes
+
+~~~~~{.haskell}
+max     :: forall <p :: a -> Prop>. Ord a => a<p> -> a<p> -> a<p>
+max x y = if x > y then x else y
+~~~~~
+
+- Given
+    - p  :: Int -> Prop
+    - 8  :: {v:Int | v > 0}
+    - 12 :: {v:Int | v > 0}
+
+- Instantiate predicate
+    - p = \\v -> v > 0
+
+- We have
+    - max 8 12 :: {v:Int | v > 0}
+
+
 
 
 ## Outline
 - Introduction 
     - Monomorphic Refinements
 - Applications
-    - <strong>Indexed Refinememts</strong>
+    - Refinements and Type Classes
+    - <strong>Indexed Refinements</strong>
     - Recursive Refinements
     - Inductive Refinements
 - Evaluation
+
+
+## Vector Initialization
+~~~~~{.haskell}
+initialize ::  x: a ->
+               n: Int ->
+               Vec a
+
+initialize x n = initialize' 0 x n empty
+
+initialize' i n x a
+  | i >= n
+  = a
+  | otherwise 
+  = initialize (i+1) n x (set i x a)
+~~~~~
+
+- The first _n_ elements are set to _x_
+- At each iteration _i_, the _i_ th element  is set to _x_
+- _Abstract_ over all invariants that depend on _i_
+
 
 ## A vector data type
 ~~~~~{.haskell}
@@ -68,10 +153,10 @@ data Vec a
   = V {f :: i : Int -> a}
 ~~~~~
 
-- Refine indices :
+- Refine indices
       - d :: Int -> Prop
 
-- Refine values given their index :
+- Refine values depending on their index
       - r :: Int -> a -> Prop
 
 ## Index Refinements
@@ -81,26 +166,26 @@ data Vec a <d :: Int -> Prop, r :: Int -> a -> Prop>
   = V {f :: i : Int<d> -> a<r i>}
 ~~~~~
 
-- Refine indices :
+- Refine indices
       - d :: Int -> Prop
 
-- Refine values given their index :
+- Refine values depending on their index
       - r :: Int -> a -> Prop
 
-## Constant Vector
+## Empty Vector
 
 ~~~~~{.haskell}
-create x = V $ \_ -> x
+empty = V $ \_ -> error "Undefined Vector"
 ~~~~~
 
-- Refine indices : all integers
-      - d = \\v -> True 
+- Refine indices : empty set
+      - d = \\v -> False
 
-- Refine values  : only x
-      - r = \\i v -> v = x
+- Refine values  : all values
+      - r = \\i v -> True
 
 ~~~~~{.haskell}
-create :: x:a -> Vec <\_ -> True, \_ v -> v = x> a
+create :: x:a -> Vec <\_ -> False, \_ _ -> True> a
 ~~~~~
 
 ## `get` a value
@@ -148,11 +233,37 @@ set :: forall <d :: Int -> Prop, r :: Int -> a -> Prop>
          Vec <d, r> a
 ~~~~~
 
+## Typechecking Vector Initializion
+~~~~~{.haskell}
+initialize :: x: a -> 
+              n: Int -> 
+              Vec <{\v -> 0 <= v && v < n}, {\_ v -> v == x}> a
+
+initialize x n = initialize' 0 n x empty
+
+initialize :: i:{v:Int | v >= 0} -> 
+              x: a -> 
+              n: Int -> 
+              a: Vec <{\v -> 0 <= v && v < i}, {\_ v -> v == x}> a -> 
+              Vec <{\v -> 0 <= v && v < n}, {\_ v -> v == x}> a
+
+initialize' i n x a
+  | i >= n
+  = a
+  | otherwise 
+  = initialize' (i+1) n x (set i x a)
+~~~~~
+
+- At each iteration _i_, the _i_ th element is set to _x_
+- At the end, then _n_ first elements are set to _x_
+
+
 ## Outline
 - Introduction 
     - Monomorphic Refinements
 - Applications
-    - Indexed Refinememts
+    - Refinements and Type Classes
+    - Indexed Refinements
     - <strong>Recursive Refinements</strong>
     - Inductive Refinements
 - Evaluation
@@ -168,7 +279,6 @@ data [a]
 - Refine tail elements given the head:
     - p :: a -> a -> Prop
 
-
 ## Recursive Refinements
 
 ~~~~~{.haskell}
@@ -177,10 +287,88 @@ data [a] <p :: a -> a -> Prop>
   | (:) h:a [a<p h>]<p>
 ~~~~~
 
-- Refine tail elements given the head:
-    - p :: a -> a -> Prop
-
 - h:tl :: [a]\<p\> iff h :: a &and; t :: [a \<p h\>]
+
+## Unfolding Recursive Refinements (0/n)
+
+~~~~~{.haskell}
+data [a] <p :: a -> a -> Prop> 
+  = []<p>
+  | (:) h:a [a<p h>]<p>
+~~~~~
+
+- h<sub>1</sub>:h<sub>2</sub>:h<sub>3</sub>:...h<sub>n</sub>:[] :: [a]\<p\> 
+    - h<sub>1</sub> :: a
+    - h<sub>2</sub> :: a
+    - h<sub>3</sub> :: a
+    - ...
+    - h<sub>n</sub> :: a
+    - [] :: [a]
+    
+## Unfolding Recursive Refinements (1/n)
+
+~~~~~{.haskell}
+data [a] <p :: a -> a -> Prop> 
+  = []<p>
+  | (:) h:a [a<p h>]<p>
+~~~~~
+
+- h<sub>1</sub>:h<sub>2</sub>:h<sub>3</sub>:...h<sub>n</sub>:[] :: [a]\<p\> 
+    - h<sub>1</sub> :: a
+    - h<sub>2</sub> :: a\<p h<sub>1</sub>\>
+    - h<sub>3</sub> :: a\<p h<sub>1</sub>\>
+    - ...
+    - h<sub>n</sub> :: a\<p h<sub>1</sub>\>
+    - [] :: [a\<p h<sub>1</sub>\>]
+    
+## Unfolding Recursive Refinements (2/n)
+
+~~~~~{.haskell}
+data [a] <p :: a -> a -> Prop> 
+  = []<p>
+  | (:) h:a [a<p h>]<p>
+~~~~~
+
+- h<sub>1</sub>:h<sub>2</sub>:h<sub>3</sub>:...h<sub>n</sub>:[] :: [a]\<p\> 
+    - h<sub>1</sub> :: a
+    - h<sub>2</sub> :: a\<p h<sub>1</sub>\>
+    - h<sub>3</sub> :: a\<p h<sub>1</sub> &and; p h<sub>2</sub>\>
+    - ...
+    - h<sub>n</sub> :: a\<p h<sub>1</sub> &and; p h<sub>2</sub>\>
+    - [] :: [a\<p h<sub>1</sub> &and; p h<sub>2</sub>\>]
+
+## Unfolding Recursive Refinements (n-1/n)
+
+~~~~~{.haskell}
+data [a] <p :: a -> a -> Prop> 
+  = []<p>
+  | (:) h:a [a<p h>]<p>
+~~~~~
+
+- h<sub>1</sub>:h<sub>2</sub>:h<sub>3</sub>:...h<sub>n</sub>:[] :: [a]\<p\> 
+    - h<sub>1</sub> :: a
+    - h<sub>2</sub> :: a\<p h<sub>1</sub>\>
+    - h<sub>3</sub> :: a\<p h<sub>1</sub> &and; p h<sub>2</sub>\>
+    - ...
+    - h<sub>n</sub> :: a\<p h<sub>1</sub> &and; p h<sub>2</sub> &and; ... &and; p h<sub>n-1</sub>\>
+    - [] :: [a\<p h<sub>1</sub> &and; p h<sub>2</sub> &and; ... &and; p h<sub>n-1</sub>\>]
+
+
+## Unfolding Recursive Refinements (n/n)
+
+~~~~~{.haskell}
+data [a] <p :: a -> a -> Prop> 
+  = []<p>
+  | (:) h:a [a<p h>]<p>
+~~~~~
+
+- h<sub>1</sub>:h<sub>2</sub>:h<sub>3</sub>:...h<sub>n</sub>:[] :: [a]\<p\> 
+    - h<sub>1</sub> :: a
+    - h<sub>2</sub> :: a\<p h<sub>1</sub>\>
+    - h<sub>3</sub> :: a\<p h<sub>1</sub> &and; p h<sub>2</sub>\>
+    - ...
+    - h<sub>n</sub> :: a\<p h<sub>1</sub> &and; p h<sub>2</sub> &and; ... &and; p h<sub>n-1</sub>\>
+    - [] :: [a\<p h<sub>1</sub> &and; p h<sub>2</sub> &and; ... &and; p h<sub>n-1</sub> &and; p h<sub>n</sub>\>]
 
 
 ## Increasing List (1/4)
@@ -193,7 +381,7 @@ data [a] <p :: a -> a -> Prop>
 type IncrList a = [a] <\h v -> h <= v>
 ~~~~~
 
-- h1 : h2 : h3 : [] :: IncList a
+- h<sub>1</sub> : h<sub>2</sub> : h<sub>3</sub> : [] :: IncList a
 
 
 ## Increasing List (2/4)
@@ -206,8 +394,29 @@ data [a] <p :: a -> a -> Prop>
 type IncrList a = [a] <\h v -> h <= v>
 ~~~~~
 
-- h1 :: a 
-- h2:h3:[] :: IncList {v:a | h1 &le; v}
+- h<sub>1</sub> : h<sub>2</sub> : h<sub>3</sub> : [] :: IncList a
+    - h<sub>1</sub> :: a 
+    - h<sub>2</sub> :: a 
+    - h<sub>3</sub> :: a 
+    - []            :: IncrList a 
+
+
+
+## Increasing List (2/4)
+
+~~~~~{.haskell}
+data [a] <p :: a -> a -> Prop> 
+  = []<p>
+  | (:) h:a [a<p h>]<p>
+
+type IncrList a = [a] <\h v -> h <= v>
+~~~~~
+
+- h<sub>1</sub> : h<sub>2</sub> : h<sub>3</sub> : [] :: IncList a
+    - h<sub>1</sub> :: a 
+    - h<sub>2</sub> :: {v:a | h<sub>1</sub> &le; v}
+    - h<sub>3</sub> :: {v:a | h<sub>1</sub> &le; v} 
+    - [] :: IncList {v:a | h<sub>1</sub> &le; v}
 
 ## Increasing List (3/4)
 
@@ -219,9 +428,11 @@ data [a] <p :: a -> a -> Prop>
 type IncrList a = [a] <\h v -> h <= v>
 ~~~~~
 
-- h1 :: a 
-- h2 :: {v:a | h1 &le; v}
-- h3:[] :: IncList {v:a | h1 &le; v &and; h2 &le; v}
+- h<sub>1</sub> : h<sub>2</sub> : h<sub>3</sub> : [] :: IncList a
+    - h<sub>1</sub> :: a 
+    - h<sub>2</sub> :: {v:a | h<sub>1</sub> &le; v}
+    - h<sub>3</sub> :: {v:a | h<sub>1</sub> &le; v &and; h<sub>2</sub> &le; v } 
+    - [] :: IncList {v:a | h<sub>1</sub> &le; v &and; h<sub>2</sub> &le; v }
 
 ## Increasing List (4/4)
 
@@ -233,10 +444,12 @@ data [a] <p :: a -> a -> Prop>
 type IncrList a = [a] <\h v -> h <= v>
 ~~~~~
 
-- h1 :: a 
-- h2 :: {v:a | h1 &le; v}
-- h3 :: {v:a | h1 &le; v &and; h2 &le; v}
-- [] :: IncList {v:a | h1 &le; v &and; h2 &le; v &and; h3 &le; v}
+- h<sub>1</sub> : h<sub>2</sub> : h<sub>3</sub> : [] :: IncList a
+    - h<sub>1</sub> :: a 
+    - h<sub>2</sub> :: {v:a | h<sub>1</sub> &le; v}
+    - h<sub>3</sub> :: {v:a | h<sub>1</sub> &le; v &and; h<sub>2</sub> &le; v } 
+    - [] :: IncList {v:a | h<sub>1</sub> &le; v &and; h<sub>2</sub> &le; v &and; h<sub>3</sub> &le; v}
+
 
 ## insert to an IncrList (1/2)
 
@@ -278,74 +491,91 @@ insert y (x:xs) | y < x     = y : x : xs
 - Introduction 
     - Monomorphic Refinements
 - Applications
-    - Indexed Refinememts
+    - Refinements and Type Classes
+    - Indexed Refinements
     - Recursive Refinements
     - <strong>Inductive Refinements</strong>
 - Evaluation
 
 
 
-## A variant of foldr
-
+## length via foldr
 ~~~~~{.haskell}
-foldr op z []     = z
-foldr op z (x:xs) = op xs x (foldr op z xs)
+length ys = foldr f 0 ys
+   where f x acc -> acc + 1
 ~~~~~
 
-
-## Typechecking foldr (1/3)
-
-~~~~~{.haskell}
-foldr op z []     = z
-foldr op z (x:xs) = op xs x (foldr op z xs)
-~~~~~
-
+- Relation : lengthR :: ([a], Int)
+    - lengthR ys v <=> len ys = v
 - Given 
-    - p    :: [a] -> b -> Prop
-    - op   :: xs:[a] -> x:a -> b\<xs\> -> b\<x:xs\>
-    - z    :: b\<p []\>
-    - x:xs :: [a]
-- Assume 
-    - foldr op z xs :: b\<xs\>
-- Then 
-    - op xs x (foldr op z xs) :: b\<x:xs\>
-    - z                       :: b\<p []\>
+     - lengthR([], 0)
+     - lengthR(xs, length xs) => lengthR(x:xs, f x (length xs))
+- We have
+     - lengthR(ys, length ys)
 
-## Typechecking foldr (2/3)
-
+## append via foldr
 ~~~~~{.haskell}
-foldr op z []     = z
-foldr op z (x:xs) = op xs x (foldr op z xs)
+append ys zs = foldr f  zs ys
+  where f x acc -> x:acc
 ~~~~~
 
+- Relation : appendR :: ([a], [a])
+    - appendR ys v <=> len v = len ys + len zs
 - Given 
-    - p    :: [a] -> b -> Prop
-    - op   :: xs:[a] -> x:a -> b\<xs\> -> b\<x:xs\>
-    - z    :: b\<p []\>
-    - x:xs :: [a]
-- Assume 
-    - foldr op z xs :: b\<xs\>
-- Then 
-    - foldr op z (x:xs)       :: b\<x:xs\>
-    - foldr op z []           :: b\<x:xs\>
+     - appendR([], zs)
+     - appendR(xs, append xs zs) => appendR(x:xs, f x (append xs zs))
+- We have 
+     - appendR(ys, append ys zs)
 
-## Typechecking foldr (3/3)
-
+## Generalize: Structural Induction
 ~~~~~{.haskell}
-foldr op z []     = z
-foldr op z (x:xs) = op xs x (foldr op z xs)
+foldr f z []     = z
+foldr f z (x:xs) = f x (foldr f z xs)
 ~~~~~
 
+- Relation : R :: ([a], b)
 - Given 
-    - p    :: [a] -> b -> Prop
-    - op   :: xs:[a] -> x:a -> b\<xs\> -> b\<x:xs\>
-    - z    :: b\<p []\>
-    - ys   :: [a]
-- Then 
-    - foldr op z ys           :: b\<ys\>
+    - R([], z)
+    - R(xs, foldr f z xs) => R(x:xs, f x (foldr f x xs))
+- We have
+    - R(ys, foldr f z ys)
+
+
+## Structural Induction via Abstract Refinements
 
 ~~~~~{.haskell}
-foldr :: forall <p :: [a] -> b -> Prop>
+foldr f z []     = z
+foldr f z (x:xs) = f x (foldr f z xs)
+~~~~~
+
+-------------------------------------------------------      ----------------------
+Relation : R :: ([a], b)                                     p :: [a] -> b -> Prop 
+R([], z)                                                     z :: b\<p []\>
+R(xs, foldr f z xs) => R(x:xs, f x (foldr f x xs))           f :: xs:[a] -> x :a -> b\<xs\> -> b\<x:xs\>
+-------------------------------------------------------      ----------------------
+
+- We have
+    - ys :: [a] -> foldr f z ys :: b\<ys\>
+
+## Typechecking foldr
+
+~~~~~{.haskell}
+foldr' f z []     = z
+foldr' f z (x:xs) = f xs x (foldr' f z xs)
+~~~~~
+
+-------------------------------------------------------      ----------------------
+Relation : R :: ([a], b)                                     p :: [a] -> b -> Prop 
+R([], z)                                                     z :: b\<p []\>
+R(xs, foldr f z xs) => R(x:xs, f x (foldr f x xs))           f :: xs:[a] -> x :a -> b\<xs\> -> b\<x:xs\>
+-------------------------------------------------------      ----------------------
+
+- We have
+    - ys :: [a] -> foldr f z ys :: b\<ys\>
+
+
+~~~~~{.haskell}
+foldr' :: forall <p :: [a] -> b -> Prop>
            op :: xs:[a] -> x:a -> b<p xs> -> b<p x:xs> -> 
            z  :: b <p []> -> 
            ys :: [a] -> 
@@ -353,41 +583,27 @@ foldr :: forall <p :: [a] -> b -> Prop>
 ~~~~~
 
 
-## Using foldr (1/2)
-
+## Typechecking length
 ~~~~~{.haskell}
-foldr :: forall <p :: [a] -> b -> Prop>
-           op :: xs:[a] -> x:a -> b<p xs> -> b<p x:xs> -> 
-           z  :: b <p []> -> 
-           ys :: [a] -> 
-           b<p ys>
+length ys = foldr f 0 ys
+   where f _ x acc -> acc + 1
 ~~~~~
 
-~~~~~{.haskell}
-length = foldr (\_ _ n -> n+1) 0
-~~~~~
- 
-p = \\xs v -> v = len xs
+- lengthR ys v <=> v = len ys
+- p = \\ys v -> v = len ys
 
 ~~~~~{.haskell}
-length :: zs : [a] -> {v:[a] | v = len zs}
+length :: ys : [a] -> {v:[a] | v = len ys}
 ~~~~~
  
-## Using foldr (2/2)
-
+## Typechecking append
 ~~~~~{.haskell}
-foldr :: forall <p :: [a] -> b -> Prop>
-           op :: xs:[a] -> x:a -> b<p xs> -> b<p x:xs> -> 
-           z  :: b <p []> -> 
-           ys :: [a] -> 
-           b<p ys>
+append ys zs = foldr f  zs ys
+  where f _ x acc -> x:acc
 ~~~~~
 
-~~~~~{.haskell}
-append ys zs = foldr (\_ -> (:)) zs ys
-~~~~~
- 
-p = \\xs v -> len v = len xs + len ys
+- appendR ys v <=> len v = len ys + len zs
+- p = \\ys v -> len v = len xs + len ys
 
 ~~~~~{.haskell}
 append :: xs : [a] -> ys : [a] -> {v:[a] | len v = len xs + len ys}
@@ -398,7 +614,8 @@ append :: xs : [a] -> ys : [a] -> {v:[a] | len v = len xs + len ys}
 - Introduction 
     - Monomorphic Refinements
 - Applications
-    - Indexed Refinememts
+    - Refinements and Type Classes
+    - Indexed Refinements
     - Recursive Refinements
     - Inductive Refinements
 - <strong>Evaluation<strong>
