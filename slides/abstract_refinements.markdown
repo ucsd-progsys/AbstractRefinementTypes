@@ -13,12 +13,14 @@ maxInt x y = if x > y then x else y
     - 8  :: {v:Int | v > 0} <: Int  
     - 12 :: {v:Int | v > 0} <: Int  
 
-- We have
+- We **get**
     - maxInt 8 12 :: Int
 
-- It should also be positive!
-
+- We **want** 
+    - maxInt 8 12 :: {v : Int | v > 0}
+ 
 ## Typechecking Monomorphic Refinements
+
 ~~~~~{.haskell}
 maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
 maxInt x y = if x > y then x else y
@@ -47,14 +49,17 @@ maxInt x y = if x > y then x else y
     - 12 :: {v:Int | v > 0}
 
 - Instantiate predicate
-    - p = \\v -> v > 0
+    - p = \v -> v > 0
 
-- We have
-    - maxInt 8 12 :: {v:Int | v > 0}
+- We get
+    - `maxInt [\v -> v > 0] 8 12 :: {v:Int | v > 0}`
+    - `maxInt [...] 8 12 :: {v:Int | v > 0}`
 
 ## Outline
+
 - Introduction 
     - Monomorphic Refinements
+
 - Applications
     - <strong>Refinements and Type Classes</strong>
     - Indexed Refinements
