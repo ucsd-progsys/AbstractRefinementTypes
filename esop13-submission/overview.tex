@@ -257,7 +257,7 @@ set :: forall <d :: Int -> Bool, r :: Int -> a -> Bool>
        -> a<r i>
        -> Vec<d && {\k -> k != i}, r> a
        -> Vec<d, r> a
-set i v (V f) = V (\k -> if k == i then x else f k)
+set i v (V f) = V (\k -> if k == i then v else f k)
 \end{code}\end{tabular}$$
 %
 The signature for @set@ requires that 
@@ -373,7 +373,7 @@ Second, we assume that @i@ satisfies the type
 @{v: Int | 0 <= v && v < n}@,
 %
 and, further, we know from the types of @s@ and @get@ that @c@ has the
-type @{v: Char | i = n - 1 => c = '\0'}@.
+type @{v: Char | i = n - 1 => v = '\0'}@.
 %
 Thus, if @c@ is non-null, then @i@ cannot be equal to @n - 1@.
 %
@@ -405,8 +405,8 @@ type FibV = Vec<{\_->True},{\i v-> v!=0 => v=fib(i)}> Int
 \end{code}\end{tabular}$$
 %
 Finally, we can use the above alias to verify @fastFib@, 
-an implementation of the Fibonacci function which uses 
-a vector to memoize intermediate results 
+an implementation of the Fibonacci function, which uses 
+a vector memoize intermediate results 
 %
 $$\centering\begin{tabular}{c}\begin{code}
 fastFib :: n:Int -> {v:Int | v = fib(n)}
