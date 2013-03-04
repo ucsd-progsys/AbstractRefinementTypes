@@ -201,25 +201,27 @@ incr i = mkPair (+1) i
 - We **get**
   - `mkPair [\i -> {v:Int | v = i+1}] (+1) :: Int -> (i:Int, {v:Int | v = i+1})`
 
+
+<!---
+
 ## Vector Initialization
 
 ~~~~~{.haskell}
-initialize ::  x: a ->
-               n: Int ->
+initialize ::  f:(Int -> a) -> 
+               i:Int ->
+               n:Int ->
+               Vec a -> 
                Vec a
 
-initialize x n = initialize' 0 x n empty
-
-initialize' i n x a
-  | i >= n
-  = a
-  | otherwise 
-  = initialize (i+1) n x (set i x a)
+initialize f i n a
+  | i >= n    = a
+  | otherwise = initialize f (i+1) n (set i (f i) a)
 ~~~~~
 
-- The first _n_ elements are set to _x_
-- At each iteration _i_, the _i_ th element  is set to _x_
+- At each iteration _i_, the _i_ th element is set to _f i_
 - _Abstract_ over all invariants that depend on _i_
+
+-->
 
 
 ## A vector data type
@@ -308,30 +310,46 @@ set :: forall <d :: Int -> Prop, r :: Int -> a -> Prop>
          Vec <d, r> a
 ~~~~~
 
+<!---
 ## Typechecking Vector Initializion
 ~~~~~{.haskell}
-initialize :: x: a -> 
+initialize :: forall <r :: Int -> a -> Prop>.
+              f:(z:Int -> a <r z>)-> 
+              i: {v:Int | v >=0} -> 
               n: Int -> 
-              Vec <{\v -> 0 <= v && v < n}, {\_ v -> v == x}> a
+              a: Vec <{\v -> 0 <= v && v < i}, r> a -> 
+              Vec <{\v -> 0 <= v && v < n}, r> a
 
-initialize x n = initialize' 0 n x empty
-
-initialize :: i:{v:Int | v >= 0} -> 
-              x: a -> 
-              n: Int -> 
-              a: Vec <{\v -> 0 <= v && v < i}, {\_ v -> v == x}> a -> 
-              Vec <{\v -> 0 <= v && v < n}, {\_ v -> v == x}> a
-
-initialize' i n x a
-  | i >= n
-  = a
-  | otherwise 
-  = initialize' (i+1) n x (set i x a)
+initialize f i n a
+  | i >= n    = a
+  | otherwise = initialize f (i+1) n (set i (f i) a)
 ~~~~~
 
-- At each iteration _i_, the _i_ th element is set to _x_
-- At the end, then _n_ first elements are set to _x_
+- At each iteration _i_, the _i_ th element is set to _f i_
+- At the end, then _[i .. n]_ elements are set to _f i_
+-->
 
+## Vector Initialization
+
+~~~~~{.haskell}
+idVec :: n:Int -> Vec <\v -> 0<=v && v < n, \i v -> i = v> a
+idVec n = initialize id 0 n empty 
+
+initialize f i n a
+  | i >=n     = a
+  | otherwise = initialize f (i+1) n (set i (f i) a)
+~~~~~
+
+- idVec 3
+- intialize id 0 3 empty
+     - empty :: forall\<r :: Int -> a -> Prop\>. Vec\<\\_ -> False, r\>
+- intialize id 1 3 s0
+     - s0 = set [\\v -> 0 <= v &and; v < 1 , \\v i -> v = i] 0 0 empty ::  Vec\<\\v -> 0 <= v &and; v <1, \\i v -> v = i\>
+- initialize id 2 3 s1
+     - s1 = set [\\v -> 0 <= v &and; v < 2 , \\v i -> v = i] 1 1 s0 ::  Vec\<\\v -> 0 <= v &and; v <2, \\i v -> v = i\>
+- initialize id 3 3 s2
+     - s2 = set [\\v -> 0 <= v &and; v < 3 , \\v i -> v = i] 2 2 s1 ::  Vec\<\\v -> 0 <= v &and; v <3, \\i v -> v = i\>
+- s2 ::  Vec\<\\v -> 0 <= v &and; v <3, \\i v -> v = i\>
 
 ## Outline
 - Introduction 
@@ -560,6 +578,22 @@ insert y (x:xs) | y < x     = y : x : xs
     - y             :: {v:a | x &le; v}
     - insert y xs   :: IncrList {v:a | x &le; v}
     - x:insert y xs :: IncrList a
+
+## insert Sort
+
+~~~~~{.haskell}
+insertSort :: xs:[a] -> OList a
+insertSort = foldr insert []
+~~~~~
+
+- Given
+    - foldr :: (a -> b -> b) -> b -> [a] -> b
+    - insert :: a -> IncrList a -> IncrList a
+- We **infer**
+    - b  := IncrList a
+    - [] :: IncrList a
+- We **get**
+    - insertSort :: [a] -> IncrList a
 
 
 ## Outline
