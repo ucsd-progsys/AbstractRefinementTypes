@@ -18,6 +18,19 @@ maxInt x y = if x > y then x else y
 
 - We **want** 
     - maxInt 8 12 :: {v : Int | v > 0}
+
+## Abstract Refinements
+
+~~~~~{.haskell}
+maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
+maxInt x y = if x > y then x else y
+~~~~~
+
+- Notation
+   - Int\<p\> <=> {v:Int | p v}
+- abstract refinement p 
+    - _uninterprented function symbol_ 
+    - satisfies conguence axiom: forall x y. (x = y) => p x = p y
  
 ## Typechecking Monomorphic Refinements
 
