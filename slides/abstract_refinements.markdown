@@ -131,8 +131,62 @@ max x y = if x > y then x else y
     - Inductive Refinements
 - Evaluation
 
+<!---
+the loop example is induction on integers?
+pair seems simpler, 
+we supported, but with more complicated syntax
+-->
+
+## Depending Pairs
+
+~~~~~{.haskell}
+mkPair :: f:(i:a -> b) -> a -> (a, b)
+mkPair f i = (i, f i)
+~~~~~
+
+- `f i` **depends** on `i`
+- Abstract over all refinements that depend on `i`
+
+
+## Indexted Refinements
+
+~~~~~{.haskell}
+mkPair :: forall<p :: a -> b -> Prop>.
+           f:(i:a -> b<p i>) -> 
+           a -> 
+           (i:a, b<p i>)
+mkPair f i = (i, f i)
+~~~~~
+
+- `f i` **depends** on `i`
+- Abstract over all refinements that depend on `i`
+
+
+## Using Indexted Refinements
+
+~~~~~{.haskell}
+mkPair :: forall<p :: a -> b -> Prop>.
+           f:(i:a -> b<p i>) -> 
+           a -> 
+           (i:a, b<p i>)
+mkPair f i = (i, f i)
+
+incr :: Int -> (i:Int, {v:Int | v = i+1})
+incr i = mkPair (+1) i
+~~~~~
+
+- Given 
+  - `p :: a -> b -> Prop`
+  - `(+1) :: i:Int -> {v:Int | v = i+1}`
+
+- We **infer**
+  - `p := \i -> {v:Int | v = i+1}`
+
+- We **get**
+  - `mkPair [\i -> {v:Int | v = i+1}] (+1) :: Int -> (i:Int, {v:Int | v = i+1})`
 
 ## Vector Initialization
+
 ~~~~~{.haskell}
 initialize ::  x: a ->
                n: Int ->
