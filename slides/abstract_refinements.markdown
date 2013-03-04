@@ -48,10 +48,10 @@ maxInt x y = if x > y then x else y
     - 8  :: {v:Int | v > 0}
     - 12 :: {v:Int | v > 0}
 
-- Instantiate predicate
+- We **infer**
     - p = \v -> v > 0
 
-- We get
+- We **get**
     - `maxInt [\v -> v > 0] 8 12 :: {v:Int | v > 0}`
     - `maxInt [...] 8 12 :: {v:Int | v > 0}`
 
@@ -67,8 +67,24 @@ maxInt x y = if x > y then x else y
     - Inductive Refinements
 - Evaluation
 
+## Polymorphic max
+~~~~~{.haskell}
+max    :: a -> a -> a
+max x y = if x > y then x else y
+~~~~~
 
-## Ignoring Type Class Constraints
+- Given
+    - 8  :: {v:Int | v > 0}
+    - 12 :: {v:Int | v > 0}
+
+- We **infer**
+    - a = {v:Int | v > 0}
+
+- We **get**
+    - max 8 12 :: {v:Int | v > 0}
+
+
+## Type Class Constraints
 ~~~~~{.haskell}
 max    :: Ord a => a -> a -> a
 max x y = if x > y then x else y
@@ -78,10 +94,10 @@ max x y = if x > y then x else y
     - 8  :: {v:Int | v > 0}
     - 12 :: {v:Int | v > 0}
 
-- Instantiate type variable
+- We **infer**
     - a = {v:Int | v > 0}
 
-- We have
+- We **get**
     - max 8 12 :: {v:Int | v > 0}
 
 ## Wrong Reasoning
@@ -97,7 +113,7 @@ minus x y = x - y
 - Instantiate type variable
     - a = {v:Int | v > 0}
 
-- We have
+- We **get**
     - minus 8 12 = -4 :: {v:Int | v > 0}
 
 ## Parametric Invariants and Type Classes
@@ -112,11 +128,11 @@ max x y = if x > y then x else y
     - 8  :: {v:Int | v > 0}
     - 12 :: {v:Int | v > 0}
 
-- Instantiate predicate
+- We **infer**
     - p = \\v -> v > 0
 
-- We have
-    - max 8 12 :: {v:Int | v > 0}
+- We **get**
+    - `max [\v -> v >0] 8 12 :: {v:Int | v > 0}`
 
 
 
