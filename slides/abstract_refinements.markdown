@@ -2,71 +2,95 @@
 % Niki Vazou, Patrick Rondon , and Ranjit Jhala
 % February 25, 2013
 
-## The maxInt example
+## Vanilla Types
+
+- `12 :: Int`
+
+## Refinement Types
+
+- `12 :: {v:Int | Pos v }`
+
+## Riner Refinement Types
+
+- `12 :: {v:Int | v = 12} <: {v:Int | Pos v && Even v}`
+
+## A max function
 
 ~~~~~{.haskell}
-maxInt     :: Int -> Int -> Int
-maxInt x y = if x > y then x else y
+max     :: Int -> Int -> Int
+max x y = if x > y then x else y
 ~~~~~
 
-- Given
-    - 8  :: {v:Int | v > 0} <: Int  
-    - 12 :: {v:Int | v > 0} <: Int  
-
-- We **get**
-    - maxInt 8 12 :: Int
-
-- We **want** 
-    - maxInt 8 12 :: {v : Int | v > 0}
-
-## Abstract Refinements
+## A max function
 
 ~~~~~{.haskell}
-maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
-maxInt x y = if x > y then x else y
+max     :: x:Int -> y:Int -> {v:Int | v >=  x && v >= y}
+max x y = if x > y then x else y
 ~~~~~
 
-- Notation
-   - Int\<p\> <=> {v:Int | p v}
-- abstract refinement p 
-    - _uninterprented function symbol_ 
-    - satisfies conguence axiom: forall x y. (x = y) => p x = p y
- 
-## Typechecking Monomorphic Refinements
+## Using max function
 
 ~~~~~{.haskell}
-maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
-maxInt x y = if x > y then x else y
+max     :: x:Int -> y:Int -> {v:Int | v >=  x && v >= y}
+max x y = if x > y then x else y
+
+a = max 8 12
+
+_ = assert (Pos a)
 ~~~~~
 
-- Given 
-     - p :: Int -> Prop
-     - x :: Int \<p\>
-     - y :: Int \<p\>
-- We have
-     - if x>y then x :: Int\<p\>
-     - else        y :: Int\<p\>
-     - maxInt x y    :: Int\<p\>
-
-
-## Using Monomorphic Refinements
+## Using max function
 
 ~~~~~{.haskell}
-maxInt     :: forall <p :: Int -> Prop>. Int<p> -> Int<p> -> Int<p>
-maxInt x y = if x > y then x else y
+max     :: x:Int -> y:Int -> {v:Int | v >=  x && v >= y}
+max x y = if x > y then x else y
+
+a = max 8 12
+
+_ = assert (Pos a)
 ~~~~~
 
-- Given
-    - p  :: Int -> Prop
-    - 8  :: {v:Int | v > 0}
-    - 12 :: {v:Int | v > 0}
+- 'a = max 8 12 :: {v : Int | v>= x && v >= y}[x/8][y/12]'
+- 'a = max 8 12 :: {v : Int | v>= 8 && v >= 12}'
+- 'a = max 8 12 :: {v : Int | v>= 8} <: {v : Int | Pos v}'
 
-- We **infer**
-    - p = \v -> v > 0
+## Using max function
 
-- We **get**
-    - `maxInt [\v -> v > 0] 8 12 :: {v:Int | v > 0}`
-    - `maxInt [...] 8 12 :: {v:Int | v > 0}`
+~~~~~{.haskell}
+max     :: x:Int -> y:Int -> {v:Int | v >=  x && v >= y}
+max x y = if x > y then x else y
+
+a , b = max 8 12, max 3 5
+
+_ = assert (Pos a), assert (Odd b)
+~~~~~
+
+- 'b = max 3 5 :: {v : Int | v>= x && v >= y}[x/3][y/5]'
+- 'b = max 3 5 :: {v : Int | v>= 5} not <: {v : Int | Odd  v}'
+
+## Using  max function
+
+- **Problem** : Information of Input Refinement is Lost
+- **Solution** : Parameterize type over Input Refinement
+
+## Using max function
+
+~~~~~{.haskell}
+max     :: forall <p :: Int -> Prop>.
+             Int<p> -> Int<p> -> Int<p>
+max x y = if x > y then x else y
+
+a , b = max [Pos] 8 12, max [Odd] 3 5
+
+_ = assert (Pos a), assert (Odd b)
+~~~~~
+
+- `max [Odd] :: {v:Int | Odd v} -> {v:Int | Odd v} -> {v:Int | Odd v}`
+
+- 3 :: {v:Int | Odd v}
+- 5 :: {v:Int | Odd v}
+
+- b :: {v : Int | Odd v}
 
 ## Outline
 
