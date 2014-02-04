@@ -70,8 +70,8 @@ Finally, the system infers that {@0 :: Even@} and {@xs' :: [Even]@},
 \ie the arguments of {@(:)@} have the expected types, thereby verifying
 the program.
 %
-The refinement type instantiations can be inferred,
-from an appropriate set of logical qualifiers, 
+The refinement type instantiations can be inferred
+from an appropriate set of logical qualifiers
 using the abstract interpretation framework of Liquid
 Types~\cite{LiquidPLDI08}.
 Here, once 
@@ -161,7 +161,7 @@ max     :: (Ord a) => a -> a -> a
 maximum :: (Ord a) => [a] -> a
 \end{code}\end{tabular}$$
 %
-We might be tempted to ignore the typeclass constraint, 
+We might be tempted to ignore the typeclass constraint
 and treat \ttcode{maximum} as @[a] -> a@. 
 This would be quite unsound, as typeclass predicates preclude
 universal quantification over refinement types. 
